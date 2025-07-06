@@ -1,0 +1,22 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: app_backend/Dockerfile
+    # Mount project root so CLI loader and code are available inside container
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./images:/app/images:ro
+      - ./static:/app/static
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      args:
+        # Built frontend dist will fetch API and static assets from localhost:8000
+        VITE_API_BASE_URL: http://localhost:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend

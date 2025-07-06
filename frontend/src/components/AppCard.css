@@ -1,0 +1,23 @@
+.app-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.app-card svg {
+  display: block;
+  margin: 0 auto;
+}
+
+.app-card-title {
+  margin-top: 8px;
+  font-weight: bold;
+}
+
+.app-card-stats {
+  margin-top: 4px;
+  font-size: 14px;
+}

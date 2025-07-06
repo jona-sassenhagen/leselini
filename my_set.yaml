@@ -1,0 +1,20 @@
+title: Animals - easy
+entries:
+  - img: images/Katze.jpg
+    correct: Katze
+    distractors: [Hund, Maus, Haus]
+  - img: images/Hund.webp
+    correct: Hund
+    distractors: [Katze, Maus, Auto]
+  - img: images/Maus.jpg
+    correct: Maus
+    distractors: [Katze, Hund, Haus]
+  - img: images/Auto.webp
+    correct: Auto
+    distractors: [Katze, Hund, Maus]
+  - img: images/Haus.webp
+    correct: Haus
+    distractors: [Katze, Hund, Maus]
+difficulty:
+  max_word_length: 5
+  min_levenshtein: 2
