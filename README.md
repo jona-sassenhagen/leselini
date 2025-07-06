@@ -9,6 +9,19 @@ You can run the loader CLI and FastAPI entirely in Docker via Compose:
 docker-compose up --build
 ```
 
+### Dynamic All-Images Game
+
+Any image files you place in the repo’s top-level `images/` folder (jpg, jpeg, png, webp) are auto-included in the "All Images" quiz—no loader or YAML change needed.
+
+The landing page card "All Images" launches a random quiz; you can customize:
+```text
+/wordmatch/dynamic?size=10&max_len=6
+```
+Where:
+- `size=N` → number of questions (default 5)
+- `max_len=L` → max word length filter (ignore to disable)
+```
+
 ### Frontend (development)
 ```bash
 cd frontend

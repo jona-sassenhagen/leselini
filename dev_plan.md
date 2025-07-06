@@ -87,7 +87,19 @@ difficulty:
   min_levenshtein: 2
 ```
 
-words load copies images to /static/sets/{uuid}/, writes rows to SQLite.
+words load copies images to /static/sets/{uuid}/, writes rows to SQLite (legacy).
+
+## 8. Dynamic All-Images Game
+
+Any image in the root `images/` folder is auto-included in a dynamic quiz—no CLI/YAML loader needed.
+
+Use:
+```
+GET /api/wordsets/dynamic/next?size=N&max_len=L
+```
+- `size=N` → number of questions (default 5)
+- `max_len=L` → max filename length filter (ignore to disable)
+- 3 random distractors per question
 
 ## 7. Difficulty engine
 

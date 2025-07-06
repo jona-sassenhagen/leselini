@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import useSWR from 'swr'
+import useSWR, { mutate } from 'swr'
 import fetcher, { API_BASE } from '../utils/fetcher'
 import './WordMatch.css'
 import correctIcon from '../assets/feedback/correct.png'
@@ -22,11 +22,14 @@ export default function WordMatch() {
       const timeout = setTimeout(() => {
         setFeedback('neutral')
         if (index + 1 >= (batch?.length || 0)) {
-          fetch('/api/trials', {
+        fetch('/api/trials', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ wordset_id: id, correct: score }),
-          }).then(() => navigate('/'))
+          }).then(() => {
+            mutate(`/api/stats/${id}`)
+            navigate('/')
+          })
         } else {
           setIndex(index + 1)
           setSelected(null)

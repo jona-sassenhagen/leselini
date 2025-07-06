@@ -1,6 +1,6 @@
 .app-card {
-  background: #fff;
-  border: 1px solid #ddd;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
   border-radius: 8px;
   padding: 16px;
   text-align: center;
@@ -20,4 +20,23 @@
 .app-card-stats {
   margin-top: 4px;
   font-size: 14px;
+}
+
+.streak-dots {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.streak-dot {
+  width: 8px;
+  height: 8px;
+  border: 1px solid var(--accent);
+  border-radius: 50%;
+  margin: 0 4px;
+  background-color: transparent;
+}
+
+.streak-dot.filled {
+  background-color: var(--accent);
 }
