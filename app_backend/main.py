@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException, Query, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from uuid import uuid4
 from datetime import datetime
 from typing import List, Optional
@@ -36,8 +37,11 @@ app.mount(
 class WordSetMetadata(BaseModel):
     id: str
     title: str
-
     model_config = ConfigDict(from_attributes=True)
+
+
+class WordSetWithStats(WordSetMetadata):
+    best: int
 
 
 class NextEntry(BaseModel):
@@ -79,13 +83,68 @@ def get_db():
         db.close()
 
 
-@app.get("/api/wordsets", response_model=List[WordSetMetadata])
+@app.get("/api/wordsets", response_model=List[WordSetWithStats])
 def list_wordsets(db: Session = Depends(get_db)):
-    sets = db.query(WordSet).all()
-    # prepend dynamic games: word-match & image-match
-    dynamic = {"id": "dynamic", "title": "All Images"}
-    image_match = {"id": "dynamic-images", "title": "Image Match"}
-    return [dynamic, image_match] + sets
+    # Get all sets from the DB
+    db_sets = db.query(WordSet).all()
+
+    # Get all trial results and group by wordset_id to find the max score
+    stats_query = (
+        db.query(
+            TrialResult.wordset_id,
+            func.max(TrialResult.correct).label("best_score"),
+        )
+        .group_by(TrialResult.wordset_id)
+        .all()
+    )
+    
+    # Create a dictionary for quick lookup of best scores
+    best_scores = {wordset_id: best_score for wordset_id, best_score in stats_query}
+
+    # Prepare the response list
+    response_sets = []
+
+    # Add dynamic sets
+    response_sets.append(
+        WordSetWithStats(
+            id="dynamic",
+            title="All Images",
+            best=best_scores.get("dynamic", 0),
+        )
+    )
+    response_sets.append(
+        WordSetWithStats(
+            id="dynamic-easy",
+            title="All Images (Easy)",
+            best=best_scores.get("dynamic-easy", 0),
+        )
+    )
+    response_sets.append(
+        WordSetWithStats(
+            id="dynamic-images",
+            title="Image Match",
+            best=best_scores.get("dynamic-images", 0),
+        )
+    )
+    response_sets.append(
+        WordSetWithStats(
+            id="dynamic-images-easy",
+            title="Image Match (Easy)",
+            best=best_scores.get("dynamic-images-easy", 0),
+        )
+    )
+
+    # Add sets from the database
+    for s in db_sets:
+        response_sets.append(
+            WordSetWithStats(
+                id=s.id,
+                title=s.title,
+                best=best_scores.get(s.id, 0),
+            )
+        )
+
+    return response_sets
 
 
 @app.get("/api/wordsets/{wordset_id}/next", response_model=List[NextEntry])
@@ -97,7 +156,7 @@ def get_next(
     db: Session = Depends(get_db),
 ):
     # Dynamic mode: scan static/images directory for all image files
-    if wordset_id == 'dynamic':
+    if wordset_id.startswith('dynamic'):
         import random
 
         img_dir = settings.static_dir.parent / 'images'
@@ -118,7 +177,8 @@ def get_next(
             # pick up to 3 distractors from remaining words
             pool = [w for f, w in words if w != stem]
             random.shuffle(pool)
-            distractors = pool[:3]
+            num_distractors = 1 if wordset_id == 'dynamic-easy' else 3
+            distractors = pool[:num_distractors]
             choices = distractors + [stem]
             random.shuffle(choices)
             batch.append(
@@ -175,7 +235,7 @@ def get_next_images(
     db: Session = Depends(get_db),
 ):
     # Only dynamic-images is supported for image-match
-    if wordset_id != 'dynamic-images':
+    if not wordset_id.startswith('dynamic-images'):
         raise HTTPException(status_code=404, detail='ImageMatch not available for this set')
     # Dynamic image-match: pick a word and 4 image choices
     import random
@@ -196,7 +256,8 @@ def get_next_images(
     for fname, stem in selected:
         pool = [f for f, w in items if w != stem]
         random.shuffle(pool)
-        choices = pool[:3] + [fname]
+        num_distractors = 1 if wordset_id == 'dynamic-images-easy' else 3
+        choices = pool[:num_distractors] + [fname]
         random.shuffle(choices)
         batch.append(
             NextImageEntry(
@@ -211,16 +272,23 @@ def get_next_images(
 
 @app.post("/api/trials", response_model=TrialResponse)
 def create_trial(trial: TrialCreate, db: Session = Depends(get_db)):
-    tr = TrialResult(
-        id=str(uuid4()),
-        wordset_id=trial.wordset_id,
-        correct=trial.correct,
-        answered_at=datetime.utcnow(),
-    )
-    db.add(tr)
-    db.commit()
-    db.refresh(tr)
-    return tr
+    print(f"Received trial data: wordset_id={trial.wordset_id}, correct={trial.correct}")
+    try:
+        tr = TrialResult(
+            id=str(uuid4()),
+            wordset_id=trial.wordset_id,
+            correct=trial.correct,
+            answered_at=datetime.utcnow(),
+        )
+        db.add(tr)
+        db.commit()
+        db.refresh(tr)
+        print(f"Successfully added trial result: {tr.id}")
+        return tr
+    except Exception as e:
+        db.rollback()
+        print(f"Error adding trial result: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to record trial: {e}")
 
 
 @app.get("/api/stats/{wordset_id}", response_model=StatsResponse)

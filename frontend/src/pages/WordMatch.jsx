@@ -24,12 +24,12 @@ export default function WordMatch() {
       const timeout = setTimeout(() => {
         setFeedback('neutral')
         if (index + 1 >= (batch?.length || 0)) {
-        fetch('/api/trials', {
+        fetch(`${API_BASE}/api/trials`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ wordset_id: id, correct: score }),
           }).then(() => {
-            mutate(`/api/stats/${id}`)
+            mutate('/api/wordsets')
             navigate('/')
           })
         } else {

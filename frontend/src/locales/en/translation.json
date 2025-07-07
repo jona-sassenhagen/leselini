@@ -7,5 +7,7 @@
   "imageMatch": "Image Match",
   "correct": "Correct",
   "wrong": "Wrong",
-  "neutral": ""
+  "neutral": "",
+  "allImagesEasy": "All Images (Easy)",
+  "imageMatchEasy": "Image Match (Easy)"
 }

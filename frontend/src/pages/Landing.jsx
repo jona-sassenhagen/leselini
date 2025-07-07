@@ -10,6 +10,7 @@ export default function Landing() {
   const { t } = useTranslation()
   if (error) return <div>{t('errorLoadingWordSets')}</div>
   if (!sets) return <div>{t('loading')}</div>
+  console.log(sets)
   return (
     <div className="landing-grid">
       {sets.map((item) => (

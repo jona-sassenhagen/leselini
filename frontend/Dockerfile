@@ -2,11 +2,10 @@ FROM node:18-alpine AS builder
 WORKDIR /app
 # Allow overriding API base URL at build time for production deployments
 ARG VITE_API_BASE_URL=http://localhost:8000
-ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
 COPY frontend/package.json ./
 RUN npm install
 COPY frontend/ ./
-RUN npm run build
+RUN VITE_API_BASE_URL=${VITE_API_BASE_URL} npm run build
 
 FROM node:18-alpine AS runner
 WORKDIR /app

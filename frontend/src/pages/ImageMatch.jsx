@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import useSWR from 'swr'
+import useSWR, { mutate } from 'swr'
 import fetcher, { API_BASE } from '../utils/fetcher'
 import { useTranslation } from 'react-i18next'
 import correctIcon from '../assets/feedback/correct.png'
@@ -17,6 +17,7 @@ export default function ImageMatch() {
     fetcher
   )
   const [index, setIndex] = useState(0)
+  const [score, setScore] = useState(0)
   const [errors, setErrors] = useState(0)
   const [selected, setSelected] = useState(null)
   const [feedback, setFeedback] = useState('neutral')
@@ -26,7 +27,14 @@ export default function ImageMatch() {
       const timeout = setTimeout(() => {
         setFeedback('neutral')
         if (index + 1 >= (batch?.length || 0)) {
-          navigate('/')
+          fetch(`${API_BASE}/api/trials`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ wordset_id: id, correct: score }),
+          }).then(() => {
+            mutate('/api/wordsets') // Revalidate the list of sets to get updated scores
+            navigate('/')
+          })
         } else {
           setIndex(index + 1)
           setSelected(null)
@@ -34,7 +42,7 @@ export default function ImageMatch() {
       }, 750)
       return () => clearTimeout(timeout)
     }
-  }, [selected])
+  }, [selected, batch, id, index, navigate, score])
 
   if (error) return <div>{t('errorLoadingQuestions')}</div>
   if (!batch) return <div>{t('loading')}</div>
@@ -43,6 +51,7 @@ export default function ImageMatch() {
   const handleSelect = (i) => {
     setSelected(i)
     if (i === entry.correct_index) {
+      setScore((s) => s + 1)
       setFeedback('correct')
     } else {
       setFeedback('wrong')
@@ -52,7 +61,9 @@ export default function ImageMatch() {
 
   return (
     <div className="imagematch-container">
-      <div className="error-counter">{t('errors')} {errors}</div>
+      <div className="error-counter">
+        {t('errors')} {errors}
+      </div>
       <img
         src={
           feedback === 'correct'
@@ -69,7 +80,12 @@ export default function ImageMatch() {
         {entry.image_choices.map((src, i) => {
           let className = 'imagematch-img'
           if (selected !== null) {
-            className += i === entry.correct_index ? ' correct' : i === selected ? ' wrong' : ''
+            className +=
+              i === entry.correct_index
+                ? ' correct'
+                : i === selected
+                ? ' wrong'
+                : ''
           }
           return (
             <img
@@ -85,7 +101,11 @@ export default function ImageMatch() {
       <div className="progress-bar">
         <div
           className="progress-bar-fill"
-          style={{ width: `${((index + (selected !== null ? 1 : 0)) / batch.length) * 100}%` }}
+          style={{
+            width: `${
+              ((index + (selected !== null ? 1 : 0)) / batch.length) * 100
+            }%`,
+          }}
         />
       </div>
     </div>

@@ -1,25 +1,19 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import useSWR from 'swr'
 import { useNavigate } from 'react-router-dom'
-import fetcher from '../utils/fetcher'
 import './AppCard.css'
 
 export default function AppCard({ wordset }) {
   const navigate = useNavigate()
   const { t } = useTranslation()
-  const { data: stats } = useSWR(
-    `/api/stats/${wordset.id}`,
-    fetcher,
-    { revalidateOnMount: true }
-  )
-  const best = stats?.best ?? 0
+  const best = wordset.best ?? 0
+
   return (
     <div
       className="app-card"
       onClick={() =>
         navigate(
-          wordset.id === 'dynamic-images'
+          wordset.id.startsWith('dynamic-images')
             ? `/imagematch/${wordset.id}`
             : `/wordmatch/${wordset.id}`
         )
@@ -28,8 +22,12 @@ export default function AppCard({ wordset }) {
       <div className="app-card-title">
         {wordset.id === 'dynamic'
           ? t('allImages')
+          : wordset.id === 'dynamic-easy'
+          ? t('allImagesEasy')
           : wordset.id === 'dynamic-images'
           ? t('imageMatch')
+          : wordset.id === 'dynamic-images-easy'
+          ? t('imageMatchEasy')
           : wordset.title}
       </div>
       <div className="app-card-stats">{best}/5</div>
