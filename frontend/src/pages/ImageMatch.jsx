@@ -1,37 +1,32 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import useSWR, { mutate } from 'swr'
+import useSWR from 'swr'
 import fetcher, { API_BASE } from '../utils/fetcher'
 import { useTranslation } from 'react-i18next'
-import './WordMatch.css'
 import correctIcon from '../assets/feedback/correct.png'
 import wrongIcon from '../assets/feedback/wrong.png'
 import neutralIcon from '../assets/feedback/neutral.png'
+import './ImageMatch.css'
 
-export default function WordMatch() {
+export default function ImageMatch() {
   const { t } = useTranslation()
   const { id } = useParams()
   const navigate = useNavigate()
-  const { data: batch, error } = useSWR(`/api/wordsets/${id}/next?size=5`, fetcher)
+  const { data: batch, error } = useSWR(
+    `/api/wordsets/${id}/next-images?size=5`,
+    fetcher
+  )
   const [index, setIndex] = useState(0)
-  const [score, setScore] = useState(0)
   const [errors, setErrors] = useState(0)
-  const [feedback, setFeedback] = useState('neutral')
   const [selected, setSelected] = useState(null)
+  const [feedback, setFeedback] = useState('neutral')
 
   useEffect(() => {
     if (selected !== null) {
       const timeout = setTimeout(() => {
         setFeedback('neutral')
         if (index + 1 >= (batch?.length || 0)) {
-        fetch('/api/trials', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ wordset_id: id, correct: score }),
-          }).then(() => {
-            mutate(`/api/stats/${id}`)
-            navigate('/')
-          })
+          navigate('/')
         } else {
           setIndex(index + 1)
           setSelected(null)
@@ -48,16 +43,15 @@ export default function WordMatch() {
   const handleSelect = (i) => {
     setSelected(i)
     if (i === entry.correct_index) {
-      setScore((s) => s + 1)
       setFeedback('correct')
     } else {
-      setErrors((e) => e + 1)
       setFeedback('wrong')
+      setErrors((e) => e + 1)
     }
   }
 
   return (
-    <div className="wordmatch-container">
+    <div className="imagematch-container">
       <div className="error-counter">{t('errors')} {errors}</div>
       <img
         src={
@@ -70,26 +64,21 @@ export default function WordMatch() {
         alt={t(feedback)}
         className="feedback-image"
       />
-      <img
-        src={`${API_BASE}${entry.image_path}`}
-        alt=""
-        className="wordmatch-image"
-      />
-      <div className="wordmatch-choices">
-        {entry.choices.map((choice, i) => {
-          let className = 'choice-button'
+      <div className="imagematch-word">{entry.word}</div>
+      <div className="imagematch-choices">
+        {entry.image_choices.map((src, i) => {
+          let className = 'imagematch-img'
           if (selected !== null) {
-            if (i === entry.correct_index) className += ' correct'
-            else if (i === selected) className += ' wrong'
+            className += i === entry.correct_index ? ' correct' : i === selected ? ' wrong' : ''
           }
           return (
-            <button
+            <img
               key={i}
+              src={`${API_BASE}${src}`}
+              alt=""
               className={className}
               onClick={() => handleSelect(i)}
-            >
-              {choice}
-            </button>
+            />
           )
         })}
       </div>

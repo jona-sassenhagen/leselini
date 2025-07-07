@@ -13,7 +13,7 @@ docker-compose up --build
 
 Any image files you place in the repo’s top-level `images/` folder (jpg, jpeg, png, webp) are auto-included in the "All Images" quiz—no loader or YAML change needed.
 
-The landing page card "All Images" launches a random quiz; you can customize:
+The landing page cards "All Images" and "Image Match" launch their respective quizzes; you can customize size/filter with:
 ```text
 /wordmatch/dynamic?size=10&max_len=6
 ```

@@ -91,7 +91,11 @@ words load copies images to /static/sets/{uuid}/, writes rows to SQLite (legacy)
 
 ## 8. Dynamic All-Images Game
 
-Any image in the root `images/` folder is auto-included in a dynamic quiz—no CLI/YAML loader needed.
+Any image in the root `images/` folder is auto-included in both dynamic quizzes—no CLI/YAML loader needed.
+
+The landing page displays two dynamic cards:
+- "All Images" → word-match dynamic quiz
+- "Image Match" → image-match dynamic quiz
 
 Use:
 ```

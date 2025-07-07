@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import useSWR from 'swr'
 import fetcher from '../utils/fetcher'
 import AppCard from '../components/AppCard'
@@ -6,8 +7,9 @@ import './Landing.css'
 
 export default function Landing() {
   const { data: sets, error } = useSWR('/api/wordsets', fetcher)
-  if (error) return <div>Error loading word sets</div>
-  if (!sets) return <div>Loading...</div>
+  const { t } = useTranslation()
+  if (error) return <div>{t('errorLoadingWordSets')}</div>
+  if (!sets) return <div>{t('loading')}</div>
   return (
     <div className="landing-grid">
       {sets.map((item) => (

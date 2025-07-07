@@ -1,0 +1,11 @@
+{
+  "loading": "Loading...",
+  "errorLoadingQuestions": "Error loading questions",
+  "errorLoadingWordSets": "Error loading word sets",
+  "errors": "Errors:",
+  "allImages": "All Images",
+  "imageMatch": "Image Match",
+  "correct": "Correct",
+  "wrong": "Wrong",
+  "neutral": ""
+}

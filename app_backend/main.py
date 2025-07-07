@@ -47,6 +47,13 @@ class NextEntry(BaseModel):
     correct_index: int
 
 
+class NextImageEntry(BaseModel):
+    id: str
+    word: str
+    image_choices: List[str]
+    correct_index: int
+
+
 class TrialCreate(BaseModel):
     wordset_id: str
     correct: int
@@ -75,9 +82,10 @@ def get_db():
 @app.get("/api/wordsets", response_model=List[WordSetMetadata])
 def list_wordsets(db: Session = Depends(get_db)):
     sets = db.query(WordSet).all()
-    # prepend a dynamic image-only game
+    # prepend dynamic games: word-match & image-match
     dynamic = {"id": "dynamic", "title": "All Images"}
-    return [dynamic] + sets
+    image_match = {"id": "dynamic-images", "title": "Image Match"}
+    return [dynamic, image_match] + sets
 
 
 @app.get("/api/wordsets/{wordset_id}/next", response_model=List[NextEntry])
@@ -154,6 +162,48 @@ def get_next(
                 image_path=f"/static/{entry.image_path}",
                 choices=choices,
                 correct_index=choices.index(entry.correct_word),
+            )
+        )
+    return batch
+
+
+@app.get("/api/wordsets/{wordset_id}/next-images", response_model=List[NextImageEntry])
+def get_next_images(
+    wordset_id: str,
+    size: int = Query(5, ge=1),
+    max_len: Optional[int] = None,
+    db: Session = Depends(get_db),
+):
+    # Only dynamic-images is supported for image-match
+    if wordset_id != 'dynamic-images':
+        raise HTTPException(status_code=404, detail='ImageMatch not available for this set')
+    # Dynamic image-match: pick a word and 4 image choices
+    import random
+    img_dir = settings.static_dir.parent / 'images'
+    try:
+        files = [p for p in img_dir.iterdir() if p.is_file() and p.suffix.lower() in ('.jpg', '.jpeg', '.png', '.webp')]
+    except Exception:
+        raise HTTPException(status_code=500, detail='Could not read images folder')
+    # derive valid words (stem) filtered by max word length
+    max_len_filter = max_len if max_len is not None else None
+    items = [(p.name, p.stem) for p in files if max_len_filter is None or len(p.stem) <= max_len_filter]
+    total = len(items)
+    if total == 0:
+        raise HTTPException(status_code=404, detail='No images available for image-match')
+    n = size if size <= total else total
+    selected = random.sample(items, n)
+    batch: List[NextImageEntry] = []
+    for fname, stem in selected:
+        pool = [f for f, w in items if w != stem]
+        random.shuffle(pool)
+        choices = pool[:3] + [fname]
+        random.shuffle(choices)
+        batch.append(
+            NextImageEntry(
+                id=stem,
+                word=stem,
+                image_choices=[f"/images/{f}" for f in choices],
+                correct_index=choices.index(fname),
             )
         )
     return batch
