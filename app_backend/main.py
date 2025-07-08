@@ -133,16 +133,7 @@ def list_wordsets(db: Session = Depends(get_db)):
             best=best_scores.get("dynamic-images-easy", 0),
         )
     )
-
     # Add sets from the database
-    for s in db_sets:
-        response_sets.append(
-            WordSetWithStats(
-                id=s.id,
-                title=s.title,
-                best=best_scores.get(s.id, 0),
-            )
-        )
 
     return response_sets
 
