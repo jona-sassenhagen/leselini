@@ -18,6 +18,12 @@ body {
   --border: #ddd;
   --accent: #4caf50;
   --error: #f44336;
+  --color-correct: var(--accent);
+  --color-wrong: var(--error);
+  --color-button-background: #e0e0e0;
+  --color-button-hover-background: #d0d0d0;
+  --color-button-border: #b0b0b0;
+  --color-button-text: #333;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -29,5 +35,25 @@ body {
     --border: #444;
     --accent: #81c784;
     --error: #e57373;
+    --color-button-background: #333;
+    --color-button-hover-background: #444;
+    --color-button-border: #666;
+    --color-button-text: #e0e0e0;
   }
+}
+
+.continue-button {
+  padding: 20px 40px;
+  font-size: 2em;
+  background-color: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: background-color 0.2s;
+}
+
+.continue-button:hover {
+  background-color: #45a049; /* A slightly darker green for hover */
 }

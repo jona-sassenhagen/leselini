@@ -9,5 +9,8 @@
   "wrong": "Wrong",
   "neutral": "",
   "allImagesEasy": "All Images (Easy)",
-  "imageMatchEasy": "Image Match (Easy)"
+  "imageMatchEasy": "Image Match (Easy)",
+  "firstLetterMatch": "First Letter Match",
+  "inverseFirstLetterMatch": "Inverse First Letter Match",
+  "continue": "Continue"
 }

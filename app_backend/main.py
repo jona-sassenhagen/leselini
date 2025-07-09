@@ -58,6 +58,20 @@ class NextImageEntry(BaseModel):
     correct_index: int
 
 
+class FirstLetterEntry(BaseModel):
+    id: str
+    image_path: str
+    choices: List[str]
+    correct_index: int
+
+
+class InverseFirstLetterEntry(BaseModel):
+    id: str
+    letter: str
+    image_choices: List[str]
+    correct_index: int
+
+
 class TrialCreate(BaseModel):
     wordset_id: str
     correct: int
@@ -100,16 +114,17 @@ def list_wordsets(db: Session = Depends(get_db)):
     
     # Create a dictionary for quick lookup of best scores
     best_scores = {wordset_id: best_score for wordset_id, best_score in stats_query}
+    print(f"[DEBUG] list_wordsets - best_scores: {best_scores}")
 
     # Prepare the response list
     response_sets = []
 
-    # Add dynamic sets
+    # Add dynamic sets (ordered by difficulty)
     response_sets.append(
         WordSetWithStats(
-            id="dynamic",
-            title="All Images",
-            best=best_scores.get("dynamic", 0),
+            id="first-letter-match",
+            title="First Letter Match",
+            best=best_scores.get("first-letter-match", 0),
         )
     )
     response_sets.append(
@@ -121,6 +136,20 @@ def list_wordsets(db: Session = Depends(get_db)):
     )
     response_sets.append(
         WordSetWithStats(
+            id="dynamic-images-easy",
+            title="Image Match (Easy)",
+            best=best_scores.get("dynamic-images-easy", 0),
+        )
+    )
+    response_sets.append(
+        WordSetWithStats(
+            id="dynamic",
+            title="All Images",
+            best=best_scores.get("dynamic", 0),
+        )
+    )
+    response_sets.append(
+        WordSetWithStats(
             id="dynamic-images",
             title="Image Match",
             best=best_scores.get("dynamic-images", 0),
@@ -128,9 +157,9 @@ def list_wordsets(db: Session = Depends(get_db)):
     )
     response_sets.append(
         WordSetWithStats(
-            id="dynamic-images-easy",
-            title="Image Match (Easy)",
-            best=best_scores.get("dynamic-images-easy", 0),
+            id="inverse-first-letter-match",
+            title="Inverse First Letter Match",
+            best=best_scores.get("inverse-first-letter-match", 0),
         )
     )
     # Add sets from the database
@@ -256,6 +285,109 @@ def get_next_images(
                 word=stem,
                 image_choices=[f"/images/{f}" for f in choices],
                 correct_index=choices.index(fname),
+            )
+        )
+    return batch
+
+
+@app.get("/api/wordsets/{wordset_id}/first-letter", response_model=List[FirstLetterEntry])
+def get_first_letter_batch(
+    wordset_id: str,
+    size: int = Query(5, ge=1),
+    db: Session = Depends(get_db),
+):
+    if wordset_id != 'first-letter-match':
+        raise HTTPException(status_code=404, detail='First Letter Match not available for this set')
+
+    import random
+    import string
+
+    img_dir = settings.static_dir.parent / 'images'
+    try:
+        files = [p for p in img_dir.iterdir() if p.is_file() and p.suffix.lower() in ('.jpg', '.jpeg', '.png', '.webp')]
+    except Exception:
+        raise HTTPException(status_code=500, detail='Could not read images folder')
+
+    items = [(p.name, p.stem) for p in files if p.stem]
+    total = len(items)
+    if total == 0:
+        raise HTTPException(status_code=404, detail='No images available for First Letter Match')
+
+    n = size if size <= total else total
+    selected = random.sample(items, n)
+
+    german_alphabet = list("ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ")
+
+    batch: List[FirstLetterEntry] = []
+    for fname, stem in selected:
+        correct_first_letter = stem[0].upper()
+        
+        pool = [letter for letter in german_alphabet if letter != correct_first_letter]
+        random.shuffle(pool)
+        
+        distractors = random.sample(pool, 3) # 3 distractors
+        choices = distractors + [correct_first_letter]
+        random.shuffle(choices)
+        
+        batch.append(
+            FirstLetterEntry(
+                id=stem,
+                image_path=f"/images/{fname}",
+                choices=choices,
+                correct_index=choices.index(correct_first_letter),
+            )
+        )
+    return batch
+
+
+@app.get("/api/wordsets/{wordset_id}/inverse-first-letter", response_model=List[InverseFirstLetterEntry])
+def get_inverse_first_letter_batch(
+    wordset_id: str,
+    size: int = Query(5, ge=1),
+    db: Session = Depends(get_db),
+):
+    if wordset_id != 'inverse-first-letter-match':
+        raise HTTPException(status_code=404, detail='Inverse First Letter Match not available for this set')
+
+    import random
+
+    img_dir = settings.static_dir.parent / 'images'
+    try:
+        files = [p for p in img_dir.iterdir() if p.is_file() and p.suffix.lower() in ('.jpg', '.jpeg', '.png', '.webp')]
+    except Exception:
+        raise HTTPException(status_code=500, detail='Could not read images folder')
+
+    items = [(p.name, p.stem) for p in files if p.stem]
+    total = len(items)
+    if total == 0:
+        raise HTTPException(status_code=404, detail='No images available for Inverse First Letter Match')
+
+    n = size if size <= total else total
+    selected_items = random.sample(items, n)
+
+    batch: List[InverseFirstLetterEntry] = []
+    for fname, stem in selected_items:
+        correct_first_letter = stem[0].upper()
+
+        # Find all images that start with the correct letter
+        correct_images = [f for f, s in items if s and s[0].upper() == correct_first_letter]
+        
+        # Select a random correct image for this question
+        correct_image_fname = random.choice(correct_images)
+
+        # Select 3 random distractors (images that don't start with the correct letter)
+        distractor_images = [f for f, s in items if s and s[0].upper() != correct_first_letter]
+        random.shuffle(distractor_images)
+        
+        choices = distractor_images[:3] + [correct_image_fname]
+        random.shuffle(choices)
+        
+        batch.append(
+            InverseFirstLetterEntry(
+                id=correct_first_letter,
+                letter=correct_first_letter,
+                image_choices=[f"/images/{f}" for f in choices],
+                correct_index=choices.index(correct_image_fname),
             )
         )
     return batch

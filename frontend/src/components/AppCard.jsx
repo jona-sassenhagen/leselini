@@ -15,6 +15,10 @@ export default function AppCard({ wordset }) {
         navigate(
           wordset.id.startsWith('dynamic-images')
             ? `/imagematch/${wordset.id}`
+            : wordset.id === 'first-letter-match'
+            ? `/first-letter-match/${wordset.id}`
+            : wordset.id === 'inverse-first-letter-match'
+            ? `/inverse-first-letter-match/${wordset.id}`
             : `/wordmatch/${wordset.id}`
         )
       }
@@ -28,6 +32,10 @@ export default function AppCard({ wordset }) {
           ? t('imageMatch')
           : wordset.id === 'dynamic-images-easy'
           ? t('imageMatchEasy')
+          : wordset.id === 'first-letter-match'
+          ? t('firstLetterMatch')
+          : wordset.id === 'inverse-first-letter-match'
+          ? t('inverseFirstLetterMatch')
           : wordset.title}
       </div>
       <div className="app-card-stats">{best}/5</div>

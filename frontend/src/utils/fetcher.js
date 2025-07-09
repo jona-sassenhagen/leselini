@@ -1,5 +1,5 @@
-// Base URL for API calls; override with VITE_API_BASE_URL if set
-export const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
+// Base URL for API calls; dynamically determined for cross-device access
+export const API_BASE = `http://${window.location.hostname}:8000`
 
 export default async function fetcher(path) {
   const url = `${API_BASE}${path}`

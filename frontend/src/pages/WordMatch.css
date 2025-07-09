@@ -17,25 +17,28 @@
   grid-template-columns: 1fr;
   gap: 8px;
   margin: 16px auto 0;
-  width: 300px;
+  width: 500px; /* Increased width */
 }
 
 @media (min-width: 400px) {
   .wordmatch-choices {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    width: 300px;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); /* Adjusted minmax */
+    width: 500px;
     margin: 16px auto 0;
   }
 }
 
 .choice-button {
-  padding: 12px;
+  padding: 12px 8px; /* Reduced horizontal padding */
   min-height: 48px;
-  font-size: 16px;
+  font-size: clamp(8px, 2.5vw, 16px); /* More flexible font size */
   touch-action: manipulation;
   background: var(--card-bg);
   color: var(--color);
   border: 1px solid var(--border);
+  text-align: center;
+  width: 100%;
+  min-width: 100px; /* Increased min-width */
 }
 
 .choice-button.correct {

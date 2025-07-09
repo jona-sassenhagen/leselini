@@ -1,0 +1,80 @@
+.first-letter-match-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  gap: 20px;
+}
+
+.first-letter-match-image {
+  max-width: 80%;
+  max-height: 300px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.first-letter-match-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  width: 100%;
+  max-width: 600px; /* Increased max-width */
+}
+
+.choice-button {
+  background-color: #f0f0f0; /* Light grey background */
+  color: var(--color-button-text);
+  border: 3px solid #ccc; /* Thicker, slightly darker border */
+  border-radius: 8px;
+  padding: 20px 15px; /* Reduced horizontal padding */
+  font-size: clamp(1em, 3vw, 2.5em); /* More flexible font size */
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.2s;
+  min-width: 100px; /* Increased min-width */
+  text-align: center;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); /* Add a subtle shadow */
+  width: 100%;
+}
+
+.choice-button:hover {
+  background-color: var(--color-button-hover-background);
+  transform: translateY(-2px);
+}
+
+.choice-button.correct {
+  background-color: var(--color-correct);
+  color: var(--color-button-text);
+}
+
+.choice-button.wrong {
+  background-color: var(--color-wrong);
+  color: var(--color-button-text);
+}
+
+.feedback-image {
+  width: 50px;
+  height: 50px;
+  margin-bottom: 10px;
+}
+
+.error-counter {
+  font-size: 1.1em;
+  color: var(--color-text);
+}
+
+.progress-bar {
+  width: 80%;
+  height: 10px;
+  background-color: var(--color-progress-background);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background-color: var(--color-progress-fill);
+  width: 0%;
+  transition: width 0.5s ease-in-out;
+}

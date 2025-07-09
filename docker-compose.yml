@@ -9,7 +9,7 @@ services:
     volumes:
       - ./images:/app/images:ro
       - ./static:/app/static
-      - ./wordmatch.db:/app/wordmatch.db
+      - wordmatch_data:/app/data
   frontend:
     build:
       context: .
@@ -21,3 +21,6 @@ services:
       - "3000:3000"
     depends_on:
       - backend
+
+volumes:
+  wordmatch_data:

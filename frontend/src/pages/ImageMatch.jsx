@@ -19,43 +19,56 @@ export default function ImageMatch() {
   const [index, setIndex] = useState(0)
   const [score, setScore] = useState(0)
   const [errors, setErrors] = useState(0)
-  const [selected, setSelected] = useState(null)
   const [feedback, setFeedback] = useState('neutral')
+  const [selected, setSelected] = useState(null)
+  const [showContinueButton, setShowContinueButton] = useState(false)
+  const [hasResponded, setHasResponded] = useState(false)
 
   useEffect(() => {
-    if (selected !== null) {
-      const timeout = setTimeout(() => {
-        setFeedback('neutral')
-        if (index + 1 >= (batch?.length || 0)) {
-          fetch(`${API_BASE}/api/trials`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ wordset_id: id, correct: score }),
-          }).then(() => {
-            mutate('/api/wordsets') // Revalidate the list of sets to get updated scores
-            navigate('/')
-          })
-        } else {
-          setIndex(index + 1)
-          setSelected(null)
-        }
-      }, 750)
-      return () => clearTimeout(timeout)
+    // No automatic timeout here anymore
+    if (batch) {
+      console.log("ImageMatch Batch data:", batch)
     }
-  }, [selected, batch, id, index, navigate, score])
+  }, [batch])
 
   if (error) return <div>{t('errorLoadingQuestions')}</div>
   if (!batch) return <div>{t('loading')}</div>
 
   const entry = batch[index]
   const handleSelect = (i) => {
+    if (hasResponded) return; // Ignore clicks if already responded
+    setHasResponded(true); // Mark as responded
     setSelected(i)
     if (i === entry.correct_index) {
       setScore((s) => s + 1)
       setFeedback('correct')
+      // Automatically proceed for correct answers after a short delay
+      setTimeout(() => {
+        handleContinue(score + 1)
+      }, 750) // Display feedback for 750ms
     } else {
       setFeedback('wrong')
       setErrors((e) => e + 1)
+      setShowContinueButton(true)
+    }
+  }
+
+  const handleContinue = (finalScore) => {
+    setFeedback('neutral')
+    setShowContinueButton(false)
+    setSelected(null)
+    setHasResponded(false) // Reset for next question
+    if (index + 1 >= (batch?.length || 0)) {
+      fetch(`${API_BASE}/api/trials`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ wordset_id: id, correct: finalScore }),
+      }).then(() => {
+        mutate('/api/wordsets') // Revalidate the list of sets to get updated scores
+        navigate('/')
+      })
+    } else {
+      setIndex(index + 1)
     }
   }
 
@@ -94,10 +107,16 @@ export default function ImageMatch() {
               alt=""
               className={className}
               onClick={() => handleSelect(i)}
+              disabled={selected !== null}
             />
           )
         })}
       </div>
+      {showContinueButton && (
+        <button className="continue-button" onClick={() => handleContinue(score)}>
+          {t('continue')}
+        </button>
+      )}
       <div className="progress-bar">
         <div
           className="progress-bar-fill"
