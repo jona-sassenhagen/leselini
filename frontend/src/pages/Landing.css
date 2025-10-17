@@ -1,6 +1,100 @@
+.landing-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+}
+
+.landing-header,
+.landing-footer {
+  width: 100%;
+  max-width: 960px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.landing-footer {
+  justify-content: center;
+}
+
+.landing-language-label {
+  font-weight: 600;
+  color: var(--color);
+}
+
+.landing-language-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.landing-language-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  color: var(--color);
+  cursor: pointer;
+  transition: transform 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.landing-language-button:hover,
+.landing-language-button:focus-visible {
+  transform: translateY(-1px);
+  border-color: var(--accent);
+}
+
+.landing-language-button.active {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.landing-language-flag {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.landing-language-text {
+  font-size: 0.875rem;
+}
+
+@media (max-width: 480px) {
+  .landing-language-text {
+    display: none;
+  }
+}
+
 .landing-grid {
+  width: 100%;
+  max-width: 960px;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 16px;
-  padding: 16px;
+}
+
+.landing-empty {
+  width: 100%;
+  max-width: 960px;
+  padding: 32px;
+  text-align: center;
+  color: var(--color);
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  background: var(--card-bg);
+}
+
+.landing-fork-link {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.landing-fork-link:hover,
+.landing-fork-link:focus-visible {
+  text-decoration: underline;
 }

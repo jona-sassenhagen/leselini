@@ -15,5 +15,9 @@
   "firstLetterMatch": "Mit welchem Buchstaben fängt das Wort an?",
   "inverseFirstLetterMatch": "Welches Bild fängt mit dem Buchstaben an?",
   "allImagesHard": "Welches Wort passt zum Bild? (Schwer)",
-  "continue": "Weiter"
+  "continue": "Weiter",
+  "language": "Sprache",
+  "languageEnglish": "Englisch",
+  "languageGerman": "Deutsch",
+  "forkMessage": "Forken, um eigene Inhalte auszuwählen"
 }
