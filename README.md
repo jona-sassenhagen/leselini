@@ -49,3 +49,10 @@ cp path/to/your/neutral.png frontend/src/assets/feedback/
 ```bash
 docker-compose up --build
 ```
+
+## Deployment (GitHub Pages)
+- Push the repository to GitHub with the `main` branch as the default branch.
+- In the repo settings under Pages, choose "GitHub Actions" as the deployment source.
+- The included workflow (`.github/workflows/deploy.yml`) builds the frontend and publishes the `dist` folder to GitHub Pages on every push to `main`.
+- Once the workflow finishes, the site is available at `https://<your-username>.github.io/<this-repo>/`.
+- If you later use a custom domain or a user-site repo (e.g. `username.github.io`), update `frontend/vite.config.js` to set `base` to `'/'` so assets resolve correctly.
