@@ -13,7 +13,7 @@ docker-compose up --build
 
 Any image files you place in the repo’s top-level `images/` folder (jpg, jpeg, png, webp) are bundled into the quizzes at build time—no loader or YAML change needed. When you start the dev server or run a production build, the images are copied into `frontend/public/images` and a manifest (`frontend/src/data/images-manifest.json`) is regenerated automatically.
 
-The landing page cards "All Images" and "Image Match" launch their respective quizzes. Scores are stored locally in the browser (`localStorage`).
+The landing page cards "Which word matches the picture?" and "Which picture matches the word?" launch their respective quizzes. Scores are stored locally in the browser (`localStorage`).
 
 ### Frontend (development)
 ```bash

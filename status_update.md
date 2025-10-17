@@ -18,7 +18,7 @@ This Kids Word-Match app now provides two fully dynamic game modes, legacy YAML-
 
 ### Frontend (React + Vite)
 - **Landing**: shows an AppCard grid of:
-  - Dynamic cards: "All Images" (WordMatch) and "Image Match".
+  - Dynamic cards: "Which word matches the picture?" (WordMatch) and "Which picture matches the word?".
   - User-defined WordSets from the database.
 - **WordMatch** (`/wordmatch/:id`): show one image + multiple-choice words, with:
   - Error counter (red tally).

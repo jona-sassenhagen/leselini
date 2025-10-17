@@ -68,24 +68,24 @@ The backend is a FastAPI application responsible for:
 
 *   `GET /api/wordsets`:
     *   **Response Model:** `List[WordSetWithStats]`
-    *   **Description:** Returns a list of all available game word sets, including dynamic games ("First Letter Match", "All Images (Easy)", "Image Match (Easy)", "All Images", "Image Match") and any user-defined sets loaded from `my_set.yaml`. Each entry includes the `id`, `title`, and the `best` score recorded for that set.
+    *   **Description:** Returns a list of all available game word sets, including dynamic games ("Which letter does the word start with?", "Which word matches the picture? (Easy)", "Which picture matches the word? (Easy)", "Which word matches the picture?", "Which picture matches the word?") and any user-defined sets loaded from `my_set.yaml`. Each entry includes the `id`, `title`, and the `best` score recorded for that set.
     *   **Implementation Notes:** The `list_wordsets` function dynamically prepends the hardcoded dynamic game entries and then appends database-loaded `WordSet` entries. It queries `TrialResult` to fetch the `best` score for each `wordset_id`.
 
 *   `GET /api/wordsets/{wordset_id}/next`:
     *   **Response Model:** `List[NextEntry]`
-    *   **Description:** Fetches a batch of word-match questions for a given `wordset_id`. Used by "All Images" and "All Images (Easy)".
+    *   **Description:** Fetches a batch of word-match questions for a given `wordset_id`. Used by "Which word matches the picture?" and its easy variant.
     *   **Parameters:** `size` (number of questions), `max_len` (max word length filter), `lev` (Levenshtein distance for distractors).
     *   **Implementation Notes:** For dynamic sets (`dynamic`, `dynamic-easy`), it scans the `images/` directory, extracts word stems, and generates scrambled choices. The number of distractors varies based on `wordset_id` (1 for easy, 3 for standard).
 
 *   `GET /api/wordsets/{wordset_id}/next-images`:
     *   **Response Model:** `List[NextImageEntry]`
-    *   **Description:** Fetches a batch of image-match questions for a given `wordset_id`. Used by "Image Match" and "Image Match (Easy)".
+    *   **Description:** Fetches a batch of image-match questions for a given `wordset_id`. Used by "Which picture matches the word?" and its easy variant.
     *   **Parameters:** `size`, `max_len`.
     *   **Implementation Notes:** Similar to `next`, but generates image choices (one correct image, three distractor images) based on the first letter of the word. The number of distractors varies based on `wordset_id`.
 
 *   `GET /api/wordsets/{wordset_id}/first-letter`:
     *   **Response Model:** `List[FirstLetterEntry]`
-    *   **Description:** Fetches a batch of "First Letter Match" questions.
+    *   **Description:** Fetches a batch of "Which letter does the word start with?" questions.
     *   **Parameters:** `size`.
     *   **Implementation Notes:** Selects images, extracts the first letter of their stem, and generates choices including the correct first letter and three random letters from the German alphabet as distractors.
 

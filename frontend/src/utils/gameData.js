@@ -44,13 +44,13 @@ function requireImages(count) {
 }
 
 const WORDSETS = [
-  { id: 'first-letter-match', title: 'First Letter Match' },
-  { id: 'dynamic-easy', title: 'All Images (Easy)' },
-  { id: 'dynamic-images-easy', title: 'Image Match (Easy)' },
-  { id: 'dynamic', title: 'All Images' },
-  { id: 'dynamic-images', title: 'Image Match' },
-  { id: 'inverse-first-letter-match', title: 'Inverse First Letter Match' },
-  { id: 'dynamic-hard', title: 'All Images (Hard)' },
+  { id: 'first-letter-match', title: 'Which letter does the word start with?' },
+  { id: 'dynamic-easy', title: 'Which word matches the picture? (Easy)' },
+  { id: 'dynamic-images-easy', title: 'Which picture matches the word? (Easy)' },
+  { id: 'dynamic', title: 'Which word matches the picture?' },
+  { id: 'dynamic-images', title: 'Which picture matches the word?' },
+  { id: 'inverse-first-letter-match', title: 'Which picture starts with the letter?' },
+  { id: 'dynamic-hard', title: 'Which word matches the picture? (Hard)' },
 ]
 
 export function getWordsets() {

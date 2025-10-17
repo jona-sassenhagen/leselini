@@ -94,7 +94,7 @@ words load copies images to /static/sets/{uuid}/, writes rows to SQLite (legacy)
 Any image in the root `images/` folder is auto-included in both dynamic quizzes—no CLI/YAML loader needed.
 
 The landing page displays two dynamic cards:
-- "All Images" → word-match dynamic quiz
+- "Which word matches the picture?" → word-match dynamic quiz
 - "Image Match" → image-match dynamic quiz
 
 Use:
@@ -150,4 +150,3 @@ uvicorn backend.main:app --reload
 ---
 
 **Ready to build.**
-

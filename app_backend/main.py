@@ -123,49 +123,49 @@ def list_wordsets(db: Session = Depends(get_db)):
     response_sets.append(
         WordSetWithStats(
             id="first-letter-match",
-            title="First Letter Match",
+            title="Which letter does the word start with?",
             best=best_scores.get("first-letter-match", 0),
         )
     )
     response_sets.append(
         WordSetWithStats(
             id="dynamic-easy",
-            title="All Images (Easy)",
+            title="Which word matches the picture? (Easy)",
             best=best_scores.get("dynamic-easy", 0),
         )
     )
     response_sets.append(
         WordSetWithStats(
             id="dynamic-images-easy",
-            title="Image Match (Easy)",
+            title="Which picture matches the word? (Easy)",
             best=best_scores.get("dynamic-images-easy", 0),
         )
     )
     response_sets.append(
         WordSetWithStats(
             id="dynamic",
-            title="All Images",
+            title="Which word matches the picture?",
             best=best_scores.get("dynamic", 0),
         )
     )
     response_sets.append(
         WordSetWithStats(
             id="dynamic-images",
-            title="Image Match",
+            title="Which picture matches the word?",
             best=best_scores.get("dynamic-images", 0),
         )
     )
     response_sets.append(
         WordSetWithStats(
             id="inverse-first-letter-match",
-            title="Inverse First Letter Match",
+            title="Which picture starts with the letter?",
             best=best_scores.get("inverse-first-letter-match", 0),
         )
     )
     response_sets.append(
         WordSetWithStats(
             id="dynamic-hard",
-            title="All Images (Hard)",
+            title="Which word matches the picture? (Hard)",
             best=best_scores.get("dynamic-hard", 0),
         )
     )
