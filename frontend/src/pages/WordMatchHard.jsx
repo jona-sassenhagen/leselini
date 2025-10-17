@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import useSWR, { mutate } from 'swr'
-import fetcher, { API_BASE } from '../utils/fetcher'
 import { useTranslation } from 'react-i18next'
-import './WordMatch.css' // Reusing the same CSS for now
+import { generateWordMatchHardBatch } from '../utils/gameData'
+import { recordBestScore } from '../utils/bestScores'
+import { assetUrl } from '../utils/assets'
+import './WordMatch.css'
 import correctIcon from '../assets/feedback/correct.png'
 import wrongIcon from '../assets/feedback/wrong.png'
 import neutralIcon from '../assets/feedback/neutral.png'
@@ -12,7 +13,8 @@ export default function WordMatchHard() {
   const { t } = useTranslation()
   const { id } = useParams()
   const navigate = useNavigate()
-  const { data: batch, error } = useSWR(`/api/wordsets/${id}/next-hard?size=5`, fetcher)
+  const [batch, setBatch] = useState(null)
+  const [error, setError] = useState(null)
   const [index, setIndex] = useState(0)
   const [score, setScore] = useState(0)
   const [errors, setErrors] = useState(0)
@@ -22,24 +24,39 @@ export default function WordMatchHard() {
   const [hasResponded, setHasResponded] = useState(false)
 
   useEffect(() => {
-    // No automatic timeout here anymore
-  }, [])
+    try {
+      const data = generateWordMatchHardBatch()
+      setBatch(data)
+      setError(null)
+      setIndex(0)
+      setScore(0)
+      setErrors(0)
+      setFeedback('neutral')
+      setSelected(null)
+      setShowContinueButton(false)
+      setHasResponded(false)
+    } catch (err) {
+      console.error('Failed to generate hard word match batch', err)
+      setBatch(null)
+      setError(err)
+    }
+  }, [id])
 
-  if (error) return <div>{t('errorLoadingQuestions')}</div>
+  if (error) return <div>{t('errorPreparingGame')}</div>
   if (!batch) return <div>{t('loading')}</div>
+  if (!batch.length) return <div>{t('errorPreparingGame')}</div>
 
   const entry = batch[index]
   const handleSelect = (i) => {
-    if (hasResponded) return; // Ignore clicks if already responded
-    setHasResponded(true); // Mark as responded
+    if (hasResponded) return
+    setHasResponded(true)
     setSelected(i)
     if (i === entry.correct_index) {
       setScore((s) => s + 1)
       setFeedback('correct')
-      // Automatically proceed for correct answers after a short delay
       setTimeout(() => {
         handleContinue(score + 1)
-      }, 750) // Display feedback for 750ms
+      }, 750)
     } else {
       setErrors((e) => e + 1)
       setFeedback('wrong')
@@ -51,16 +68,10 @@ export default function WordMatchHard() {
     setFeedback('neutral')
     setShowContinueButton(false)
     setSelected(null)
-    setHasResponded(false) // Reset for next question
-    if (index + 1 >= (batch?.length || 0)) {
-      fetch(`${API_BASE}/api/trials`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ wordset_id: id, correct: finalScore }),
-      }).then(() => {
-        mutate('/api/wordsets')
-        navigate('/')
-      })
+    setHasResponded(false)
+    if (index + 1 >= batch.length) {
+      recordBestScore(id, finalScore)
+      navigate('/')
     } else {
       setIndex(index + 1)
     }
@@ -80,11 +91,7 @@ export default function WordMatchHard() {
         alt={t(feedback)}
         className="feedback-image"
       />
-      <img
-        src={`${API_BASE}${entry.image_path}`}
-        alt=""
-        className="wordmatch-image"
-      />
+      <img src={assetUrl(entry.image_path)} alt="" className="wordmatch-image" />
       <div className="wordmatch-choices">
         {entry.choices.map((choice, i) => {
           let className = 'choice-button'
@@ -97,7 +104,7 @@ export default function WordMatchHard() {
               key={i}
               className={className}
               onClick={() => handleSelect(i)}
-              disabled={selected !== null} // Disable buttons after selection
+              disabled={selected !== null}
             >
               {choice}
             </button>

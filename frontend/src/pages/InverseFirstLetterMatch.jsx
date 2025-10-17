@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import useSWR, { mutate } from 'swr'
-import fetcher, { API_BASE } from '../utils/fetcher'
 import { useTranslation } from 'react-i18next'
+import { generateInverseFirstLetterBatch } from '../utils/gameData'
+import { recordBestScore } from '../utils/bestScores'
+import { assetUrl } from '../utils/assets'
 import correctIcon from '../assets/feedback/correct.png'
 import wrongIcon from '../assets/feedback/wrong.png'
 import neutralIcon from '../assets/feedback/neutral.png'
@@ -12,7 +13,8 @@ export default function InverseFirstLetterMatch() {
   const { t } = useTranslation()
   const { id } = useParams()
   const navigate = useNavigate()
-  const { data: batch, error } = useSWR(`/api/wordsets/${id}/inverse-first-letter?size=5`, fetcher)
+  const [batch, setBatch] = useState(null)
+  const [error, setError] = useState(null)
   const [index, setIndex] = useState(0)
   const [score, setScore] = useState(0)
   const [errors, setErrors] = useState(0)
@@ -22,29 +24,42 @@ export default function InverseFirstLetterMatch() {
   const [hasResponded, setHasResponded] = useState(false)
 
   useEffect(() => {
-    // No automatic timeout here anymore
-  }, [])
+    try {
+      const data = generateInverseFirstLetterBatch()
+      setBatch(data)
+      setError(null)
+      setIndex(0)
+      setScore(0)
+      setErrors(0)
+      setFeedback('neutral')
+      setSelected(null)
+      setShowContinueButton(false)
+      setHasResponded(false)
+    } catch (err) {
+      console.error('Failed to generate inverse first letter batch', err)
+      setBatch(null)
+      setError(err)
+    }
+  }, [id])
 
-  if (error) return <div>{t('errorLoadingQuestions')}</div>
+  if (error) return <div>{t('errorPreparingGame')}</div>
   if (!batch) return <div>{t('loading')}</div>
+  if (!batch.length) return <div>{t('errorPreparingGame')}</div>
 
   const entry = batch[index]
   const handleSelect = (i) => {
-    if (hasResponded) return; // Ignore clicks if already responded
-    setHasResponded(true); // Mark as responded
+    if (hasResponded) return
+    setHasResponded(true)
     setSelected(i)
     if (i === entry.correct_index) {
       setScore((s) => s + 1)
       setFeedback('correct')
-      console.log(`Correct! Current score: ${score + 1}`)
-      // Automatically proceed for correct answers after a short delay
       setTimeout(() => {
         handleContinue(score + 1)
-      }, 750) // Display feedback for 750ms
+      }, 750)
     } else {
       setErrors((e) => e + 1)
       setFeedback('wrong')
-      console.log(`Wrong! Current errors: ${errors + 1}`)
       setShowContinueButton(true)
     }
   }
@@ -53,17 +68,10 @@ export default function InverseFirstLetterMatch() {
     setFeedback('neutral')
     setShowContinueButton(false)
     setSelected(null)
-    setHasResponded(false) // Reset for next question
-    console.log(`Final score sent to backend: ${finalScore}`)
-    if (index + 1 >= (batch?.length || 0)) {
-      fetch(`${API_BASE}/api/trials`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ wordset_id: id, correct: finalScore }),
-      }).then(() => {
-        mutate('/api/wordsets')
-        navigate('/')
-      })
+    setHasResponded(false)
+    if (index + 1 >= batch.length) {
+      recordBestScore(id, finalScore)
+      navigate('/')
     } else {
       setIndex(index + 1)
     }
@@ -85,22 +93,25 @@ export default function InverseFirstLetterMatch() {
         alt={t(feedback)}
         className="feedback-image"
       />
-      <div className="inverse-first-letter-match-letter">{entry.letter}</div>
-      <div className="inverse-first-letter-match-choices">
+      <div className="inverse-first-letter-letter">{entry.letter}</div>
+      <div className="inverse-first-letter-choices">
         {entry.image_choices.map((src, i) => {
-          let className = 'choice-image'
+          let className = 'inverse-first-letter-image'
           if (selected !== null) {
-            if (i === entry.correct_index) className += ' correct'
-            else if (i === selected) className += ' wrong'
+            className +=
+              i === entry.correct_index
+                ? ' correct'
+                : i === selected
+                ? ' wrong'
+                : ''
           }
           return (
             <img
               key={i}
-              src={`${API_BASE}${src}`}
+              src={assetUrl(src)}
               alt=""
               className={className}
               onClick={() => handleSelect(i)}
-              disabled={selected !== null}
             />
           )
         })}

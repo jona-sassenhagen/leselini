@@ -9,25 +9,24 @@ You can run the loader CLI and FastAPI entirely in Docker via Compose:
 docker-compose up --build
 ```
 
-### Dynamic All-Images Game
+### Dynamic All-Images Game (Static)
 
-Any image files you place in the repo’s top-level `images/` folder (jpg, jpeg, png, webp) are auto-included in the "All Images" quiz—no loader or YAML change needed.
+Any image files you place in the repo’s top-level `images/` folder (jpg, jpeg, png, webp) are bundled into the quizzes at build time—no loader or YAML change needed. When you start the dev server or run a production build, the images are copied into `frontend/public/images` and a manifest (`frontend/src/data/images-manifest.json`) is regenerated automatically.
 
-The landing page cards "All Images" and "Image Match" launch their respective quizzes; you can customize size/filter with:
-```text
-/wordmatch/dynamic?size=10&max_len=6
-```
-Where:
-- `size=N` → number of questions (default 5)
-- `max_len=L` → max word length filter (ignore to disable)
-```
+The landing page cards "All Images" and "Image Match" launch their respective quizzes. Scores are stored locally in the browser (`localStorage`).
 
 ### Frontend (development)
 ```bash
 cd frontend
 npm install
-# Set VITE_API_BASE_URL to point at the backend (default http://localhost:8000)
-VITE_API_BASE_URL=http://localhost:8000 npm run dev
+npm run dev
+```
+
+The dev server runs a sync step that copies `../images` into `frontend/public/images` and regenerates `frontend/src/data/images-manifest.json`. To refresh the manifest manually (without restarting the dev server), run:
+
+```bash
+npm run generate:manifest
+```
 
 ## Feedback Icons
 
@@ -43,7 +42,6 @@ cp path/to/your/correct.png frontend/src/assets/feedback/
 cp path/to/your/wrong.png frontend/src/assets/feedback/
 cp path/to/your/neutral.png frontend/src/assets/feedback/
 ```
-```
 
 ## Production (Docker)
 ```bash
@@ -55,4 +53,5 @@ docker-compose up --build
 - In the repo settings under Pages, choose "GitHub Actions" as the deployment source.
 - The included workflow (`.github/workflows/deploy.yml`) builds the frontend and publishes the `dist` folder to GitHub Pages on every push to `main`.
 - Once the workflow finishes, the site is available at `https://<your-username>.github.io/<this-repo>/`.
+- The site runs entirely as static content (no backend). Scores are stored per-browser via `localStorage`.
 - If you later use a custom domain or a user-site repo (e.g. `username.github.io`), update `frontend/vite.config.js` to set `base` to `'/'` so assets resolve correctly.
