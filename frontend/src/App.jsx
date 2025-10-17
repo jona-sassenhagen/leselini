@@ -5,6 +5,7 @@ import WordMatch from './pages/WordMatch'
 import ImageMatch from './pages/ImageMatch'
 import FirstLetterMatch from './pages/FirstLetterMatch'
 import InverseFirstLetterMatch from './pages/InverseFirstLetterMatch'
+import WordMatchHard from './pages/WordMatchHard' 
 
 export default function App() {
   return (
@@ -12,6 +13,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/wordmatch/:id" element={<WordMatch />} />
+        <Route path="/wordmatch-hard/:id" element={<WordMatchHard />} />
         <Route path="/imagematch/:id" element={<ImageMatch />} />
         <Route path="/first-letter-match/:id" element={<FirstLetterMatch />} />
         <Route path="/inverse-first-letter-match/:id" element={<InverseFirstLetterMatch />} />

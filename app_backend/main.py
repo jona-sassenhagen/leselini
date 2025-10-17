@@ -162,6 +162,13 @@ def list_wordsets(db: Session = Depends(get_db)):
             best=best_scores.get("inverse-first-letter-match", 0),
         )
     )
+    response_sets.append(
+        WordSetWithStats(
+            id="dynamic-hard",
+            title="All Images (Hard)",
+            best=best_scores.get("dynamic-hard", 0),
+        )
+    )
     # Add sets from the database
 
     return response_sets
@@ -390,6 +397,63 @@ def get_inverse_first_letter_batch(
                 correct_index=choices.index(correct_image_fname),
             )
         )
+    return batch
+
+
+@app.get("/api/wordsets/{wordset_id}/next-hard", response_model=List[NextEntry])
+def get_next_hard(
+    wordset_id: str,
+    size: int = Query(5, ge=1),
+    max_len: Optional[int] = None,
+    db: Session = Depends(get_db),
+):
+    if wordset_id != 'dynamic-hard':
+        raise HTTPException(status_code=404, detail='Hard mode not available for this set')
+
+    import random
+    from collections import defaultdict
+
+    img_dir = settings.static_dir.parent / 'images'
+    try:
+        files = [p for p in img_dir.iterdir() if p.is_file() and p.suffix.lower() in ('.jpg', '.jpeg', '.png', '.webp')]
+    except Exception:
+        raise HTTPException(status_code=500, detail='Could not read images folder')
+
+    max_len_filter = max_len if max_len is not None else None
+    words = [(p.name, p.stem) for p in files if (max_len_filter is None or len(p.stem) <= max_len_filter)]
+
+    words_by_letter = defaultdict(list)
+    for fname, stem in words:
+        words_by_letter[stem[0].upper()].append((fname, stem))
+
+    eligible_letters = [letter for letter, word_list in words_by_letter.items() if len(word_list) >= 3]
+
+    if len(eligible_letters) < 1:
+        raise HTTPException(status_code=404, detail='Not enough images to generate a hard question')
+
+    batch: List[NextEntry] = []
+    for _ in range(size):
+        chosen_letter = random.choice(eligible_letters)
+        print(f"[DEBUG] get_next_hard - Chosen Letter: {chosen_letter}")
+        
+        correct_word_fname, correct_word_stem = random.choice(words_by_letter[chosen_letter])
+
+        distractor_pool = [stem for fname, stem in words_by_letter[chosen_letter] if stem != correct_word_stem]
+        random.shuffle(distractor_pool)
+        distractors = distractor_pool[:2]
+
+        choices = distractors + [correct_word_stem]
+        random.shuffle(choices)
+
+        batch.append(
+            NextEntry(
+                id=correct_word_stem,
+                image_path=f"/images/{correct_word_fname}",
+                choices=choices,
+                correct_index=choices.index(correct_word_stem),
+            )
+        )
+    
     return batch
 
 

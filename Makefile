@@ -9,18 +9,16 @@ up:
 	docker compose up -d
 
 down:
-	docker compose down
+	docker compose down -v
 
 clean:
 	rm -f wordmatch.db
 
 reset:
-	$(MAKE) clean
-	$(MAKE) up
+	$(MAKE) down
 
 load-wordset:
 	docker compose run --rm backend python cli/words.py my_set.yaml
 
 app:
-	docker compose up --build
-
+	docker compose up --no-build

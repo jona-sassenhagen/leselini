@@ -19,6 +19,8 @@ export default function AppCard({ wordset }) {
             ? `/first-letter-match/${wordset.id}`
             : wordset.id === 'inverse-first-letter-match'
             ? `/inverse-first-letter-match/${wordset.id}`
+            : wordset.id === 'dynamic-hard'
+            ? `/wordmatch-hard/${wordset.id}`
             : `/wordmatch/${wordset.id}`
         )
       }
@@ -36,6 +38,8 @@ export default function AppCard({ wordset }) {
           ? t('firstLetterMatch')
           : wordset.id === 'inverse-first-letter-match'
           ? t('inverseFirstLetterMatch')
+          : wordset.id === 'dynamic-hard'
+          ? t('allImagesHard')
           : wordset.title}
       </div>
       <div className="app-card-stats">{best}/5</div>
