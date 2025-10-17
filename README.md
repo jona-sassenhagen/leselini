@@ -11,7 +11,7 @@ docker-compose up --build
 
 ### Dynamic All-Images Game (Static)
 
-Any image files you place in the repo’s top-level `images/` folder (jpg, jpeg, png, webp) are bundled into the quizzes at build time—no loader or YAML change needed. When you start the dev server or run a production build, the images are copied into `frontend/public/images` and a manifest (`frontend/src/data/images-manifest.json`) is regenerated automatically.
+Any image files you place in the repo’s top-level `images/` folder (jpg, jpeg, png, webp) are bundled into the quizzes at build time—no loader or YAML change needed. When you start the dev server or run a production build, the images are copied into `frontend/public/images` and a manifest (`frontend/src/data/images-manifest.json`) is regenerated automatically. Text labels come from `frontend/src/data/image-labels.json`; update that file to add more translations (currently German + English).
 
 The landing page cards "Which word matches the picture?" and "Which picture matches the word?" launch their respective quizzes. Scores are stored locally in the browser (`localStorage`).
 

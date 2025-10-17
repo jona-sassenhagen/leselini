@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { generateWordMatchHardBatch } from '../utils/gameData'
@@ -10,9 +10,10 @@ import wrongIcon from '../assets/feedback/wrong.png'
 import neutralIcon from '../assets/feedback/neutral.png'
 
 export default function WordMatchHard() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { id } = useParams()
   const navigate = useNavigate()
+  const language = useMemo(() => i18n.language?.split?.('-')?.[0] ?? 'de', [i18n.language])
   const [batch, setBatch] = useState(null)
   const [error, setError] = useState(null)
   const [index, setIndex] = useState(0)
@@ -25,7 +26,7 @@ export default function WordMatchHard() {
 
   useEffect(() => {
     try {
-      const data = generateWordMatchHardBatch()
+      const data = generateWordMatchHardBatch(language)
       setBatch(data)
       setError(null)
       setIndex(0)
@@ -40,7 +41,7 @@ export default function WordMatchHard() {
       setBatch(null)
       setError(err)
     }
-  }, [id])
+  }, [id, language])
 
   if (error) return <div>{t('errorPreparingGame')}</div>
   if (!batch) return <div>{t('loading')}</div>
