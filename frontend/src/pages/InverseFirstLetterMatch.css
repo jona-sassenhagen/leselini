@@ -7,7 +7,7 @@
   gap: 20px;
 }
 
-.inverse-first-letter-match-letter {
+.inverse-first-letter-letter {
   font-size: 5em;
   font-weight: bold;
   color: var(--color);
@@ -24,25 +24,26 @@
   justify-items: center;
 }
 
-.choice-image {
+.inverse-first-letter-image {
   width: 100%;
-  height: auto;
+  height: 150px;
+  object-fit: cover;
   border: 3px solid var(--color-button-border);
   border-radius: 8px;
   cursor: pointer;
   transition: border-color 0.2s, transform 0.2s;
 }
 
-.choice-image:hover {
+.inverse-first-letter-image:hover {
   transform: translateY(-2px);
 }
 
-.choice-image.correct {
+.inverse-first-letter-image.correct {
   border-width: 5px;
   border-color: var(--color-correct);
 }
 
-.choice-image.wrong {
+.inverse-first-letter-image.wrong {
   border-width: 5px;
   border-color: var(--color-wrong);
 }
