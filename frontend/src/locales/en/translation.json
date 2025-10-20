@@ -19,5 +19,7 @@
   "language": "Language",
   "languageEnglish": "English",
   "languageGerman": "German",
-  "forkMessage": "Fork to choose your own items"
+  "forkMessage": "Fork to choose your own items",
+  "victoryTitle": "Your result",
+  "victorySummary": "You answered {{correct}} of {{total}} correctly."
 }

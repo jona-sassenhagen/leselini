@@ -19,5 +19,7 @@
   "language": "Sprache",
   "languageEnglish": "Englisch",
   "languageGerman": "Deutsch",
-  "forkMessage": "Forken, um eigene Inhalte auszuwählen"
+  "forkMessage": "Forken, um eigene Inhalte auszuwählen",
+  "victoryTitle": "Dein Ergebnis",
+  "victorySummary": "Du hast {{correct}} von {{total}} richtig beantwortet."
 }

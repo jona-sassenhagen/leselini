@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { generateWordMatchBatch } from '../utils/gameData'
 import { recordBestScore } from '../utils/bestScores'
 import { assetUrl } from '../utils/assets'
+import VictoryScreen from '../components/VictoryScreen'
 import './WordMatch.css'
 import correctIcon from '../assets/feedback/correct.png'
 import wrongIcon from '../assets/feedback/wrong.png'
@@ -23,6 +24,8 @@ export default function WordMatch() {
   const [selected, setSelected] = useState(null)
   const [showContinueButton, setShowContinueButton] = useState(false)
   const [hasResponded, setHasResponded] = useState(false)
+  const [results, setResults] = useState([])
+  const [isComplete, setIsComplete] = useState(false)
 
   useEffect(() => {
     try {
@@ -36,6 +39,8 @@ export default function WordMatch() {
       setSelected(null)
       setShowContinueButton(false)
       setHasResponded(false)
+      setResults([])
+      setIsComplete(false)
     } catch (err) {
       console.error('Failed to generate word match batch', err)
       setBatch(null)
@@ -46,12 +51,22 @@ export default function WordMatch() {
   if (error) return <div>{t('errorPreparingGame')}</div>
   if (!batch) return <div>{t('loading')}</div>
   if (!batch.length) return <div>{t('errorPreparingGame')}</div>
+  if (isComplete) {
+    return (
+      <VictoryScreen
+        results={results}
+        onContinue={() => navigate('/')}
+      />
+    )
+  }
 
   const entry = batch[index]
   const handleSelect = (i) => {
     if (hasResponded) return
     setHasResponded(true)
     setSelected(i)
+    const outcome = i === entry.correct_index ? 'correct' : 'wrong'
+    setResults((prev) => [...prev, outcome])
     if (i === entry.correct_index) {
       setScore((s) => s + 1)
       setFeedback('correct')
@@ -65,14 +80,14 @@ export default function WordMatch() {
     }
   }
 
-  const handleContinue = (finalScore) => {
+  const handleContinue = (nextScore) => {
     setFeedback('neutral')
     setShowContinueButton(false)
     setSelected(null)
     setHasResponded(false)
     if (index + 1 >= batch.length) {
-      recordBestScore(id, finalScore)
-      navigate('/')
+      recordBestScore(id, nextScore)
+      setIsComplete(true)
     } else {
       setIndex(index + 1)
     }

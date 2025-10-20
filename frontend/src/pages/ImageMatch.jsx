@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { generateImageMatchBatch } from '../utils/gameData'
 import { recordBestScore } from '../utils/bestScores'
 import { assetUrl } from '../utils/assets'
+import VictoryScreen from '../components/VictoryScreen'
 import correctIcon from '../assets/feedback/correct.png'
 import wrongIcon from '../assets/feedback/wrong.png'
 import neutralIcon from '../assets/feedback/neutral.png'
@@ -23,6 +24,8 @@ export default function ImageMatch() {
   const [selected, setSelected] = useState(null)
   const [showContinueButton, setShowContinueButton] = useState(false)
   const [hasResponded, setHasResponded] = useState(false)
+  const [results, setResults] = useState([])
+  const [isComplete, setIsComplete] = useState(false)
 
   useEffect(() => {
     try {
@@ -36,6 +39,8 @@ export default function ImageMatch() {
       setSelected(null)
       setShowContinueButton(false)
       setHasResponded(false)
+      setResults([])
+      setIsComplete(false)
     } catch (err) {
       console.error('Failed to generate image match batch', err)
       setBatch(null)
@@ -46,13 +51,23 @@ export default function ImageMatch() {
   if (error) return <div>{t('errorPreparingGame')}</div>
   if (!batch) return <div>{t('loading')}</div>
   if (!batch.length) return <div>{t('errorPreparingGame')}</div>
+  if (isComplete) {
+    return (
+      <VictoryScreen
+        results={results}
+        onContinue={() => navigate('/')}
+      />
+    )
+  }
 
   const entry = batch[index]
   const handleSelect = (i) => {
     if (hasResponded) return
     setHasResponded(true)
     setSelected(i)
-    if (i === entry.correct_index) {
+    const outcome = i === entry.correct_index ? 'correct' : 'wrong'
+    setResults((prev) => [...prev, outcome])
+    if (outcome === 'correct') {
       setScore((s) => s + 1)
       setFeedback('correct')
       setTimeout(() => {
@@ -65,14 +80,14 @@ export default function ImageMatch() {
     }
   }
 
-  const handleContinue = (finalScore) => {
+  const handleContinue = (nextScore) => {
     setFeedback('neutral')
     setShowContinueButton(false)
     setSelected(null)
     setHasResponded(false)
     if (index + 1 >= batch.length) {
-      recordBestScore(id, finalScore)
-      navigate('/')
+      recordBestScore(id, nextScore)
+      setIsComplete(true)
     } else {
       setIndex(index + 1)
     }

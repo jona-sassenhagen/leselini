@@ -1,0 +1,44 @@
+.victory-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 32px 16px;
+  text-align: center;
+}
+
+.victory-title {
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+  color: var(--color);
+}
+
+.victory-icons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  max-width: 600px;
+}
+
+.victory-icon {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+}
+
+.victory-icon.correct {
+  filter: drop-shadow(0 0 4px rgba(129, 199, 132, 0.4));
+}
+
+.victory-icon.wrong {
+  filter: drop-shadow(0 0 4px rgba(229, 115, 115, 0.4));
+}
+
+.victory-summary {
+  font-size: 1.1rem;
+  color: var(--color);
+}
+
+.victory-screen .continue-button {
+  min-width: 200px;
+}
