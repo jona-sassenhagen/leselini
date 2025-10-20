@@ -8,6 +8,7 @@ import VictoryScreen from '../components/VictoryScreen'
 import correctIcon from '../assets/feedback/correct.png'
 import wrongIcon from '../assets/feedback/wrong.png'
 import neutralIcon from '../assets/feedback/neutral.png'
+import './ImageMatch.css'
 import './InverseFirstLetterMatch.css'
 
 export default function InverseFirstLetterMatch() {
@@ -94,7 +95,7 @@ export default function InverseFirstLetterMatch() {
   }
 
   return (
-    <div className="inverse-first-letter-match-container">
+    <div className="imagematch-container inverse-first-letter-match-container">
       <div className="error-counter">
         {t('errors')} {errors}
       </div>
@@ -110,9 +111,9 @@ export default function InverseFirstLetterMatch() {
         className="feedback-image"
       />
       <div className="inverse-first-letter-letter">{entry.letter}</div>
-      <div className="inverse-first-letter-choices">
+      <div className="imagematch-choices inverse-first-letter-choices">
         {entry.image_choices.map((src, i) => {
-          let className = 'inverse-first-letter-image'
+          let className = 'imagematch-img'
           if (selected !== null) {
             className +=
               i === entry.correct_index

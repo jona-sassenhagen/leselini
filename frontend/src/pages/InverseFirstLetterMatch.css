@@ -1,75 +1,15 @@
 .inverse-first-letter-match-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  gap: 20px;
+  gap: 16px;
 }
 
 .inverse-first-letter-letter {
-  font-size: 5em;
-  font-weight: bold;
+  font-size: clamp(2.5rem, 8vw, 4rem);
+  font-weight: 700;
   color: var(--color);
-  margin-bottom: 20px;
   text-align: center;
 }
 
-.inverse-first-letter-match-choices {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
+.inverse-first-letter-choices {
   width: 100%;
-  max-width: 600px;
-  justify-items: center;
-}
-
-.inverse-first-letter-image {
-  width: 100%;
-  height: 150px;
-  object-fit: cover;
-  border: 3px solid var(--color-button-border);
-  border-radius: 8px;
-  cursor: pointer;
-  transition: border-color 0.2s, transform 0.2s;
-}
-
-.inverse-first-letter-image:hover {
-  transform: translateY(-2px);
-}
-
-.inverse-first-letter-image.correct {
-  border-width: 5px;
-  border-color: var(--color-correct);
-}
-
-.inverse-first-letter-image.wrong {
-  border-width: 5px;
-  border-color: var(--color-wrong);
-}
-
-.feedback-image {
-  width: 50px;
-  height: 50px;
-  margin-bottom: 10px;
-}
-
-.error-counter {
-  font-size: 1.1em;
-  color: var(--color-text);
-}
-
-.progress-bar {
-  width: 80%;
-  height: 10px;
-  background-color: var(--color-progress-background);
-  border-radius: 5px;
-  overflow: hidden;
-}
-
-.progress-bar-fill {
-  height: 100%;
-  background-color: var(--color-progress-fill);
-  width: 0%;
-  transition: width 0.5s ease-in-out;
+  max-width: 400px;
 }
