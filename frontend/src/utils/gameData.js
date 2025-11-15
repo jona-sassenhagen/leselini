@@ -257,7 +257,16 @@ export function generateWritingGameBatch(wordsetId, language = DEFAULT_LANGUAGE,
   return selection.map((entry) => {
     const correctWord = entry.word.toUpperCase()
     const letters = correctWord.split('')
-    const shuffledLetters = shuffle(letters)
+
+    // Keep shuffling until the order is different from the correct order
+    let shuffledLetters = shuffle(letters)
+    let attempts = 0
+    const maxAttempts = 100
+
+    while (shuffledLetters.join('') === correctWord && attempts < maxAttempts) {
+      shuffledLetters = shuffle(letters)
+      attempts++
+    }
 
     return {
       id: entry.stem,
