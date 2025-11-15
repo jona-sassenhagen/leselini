@@ -89,6 +89,8 @@ const WORDSETS = [
   { id: 'dynamic-images', title: 'Which picture matches the word?' },
   { id: 'inverse-first-letter-match', title: 'Which picture starts with the letter?' },
   { id: 'dynamic-hard', title: 'Which word matches the picture? (Hard)' },
+  { id: 'writing-game-easy', title: 'Arrange the letters to spell the word (Easy)' },
+  { id: 'writing-game-hard', title: 'Arrange the letters to spell the word (Hard)' },
 ]
 
 export function getWordsets() {
@@ -236,4 +238,32 @@ export function generateInverseFirstLetterBatch(language = DEFAULT_LANGUAGE, siz
     })
   }
   return batch
+}
+
+export function generateWritingGameBatch(wordsetId, language = DEFAULT_LANGUAGE, size = FALLBACK_SIZE) {
+  requireImages(1)
+  const pool = localizeImages(language).filter((entry) => entry.word.length > 0)
+
+  // Filter by difficulty
+  const filteredPool = wordsetId === 'writing-game-easy'
+    ? pool.filter((entry) => entry.word.length <= 4)
+    : wordsetId === 'writing-game-hard'
+    ? pool.filter((entry) => entry.word.length > 4)
+    : pool
+
+  const available = Math.min(size, filteredPool.length)
+  const selection = sample(filteredPool, available)
+
+  return selection.map((entry) => {
+    const correctWord = entry.word.toUpperCase()
+    const letters = correctWord.split('')
+    const shuffledLetters = shuffle(letters)
+
+    return {
+      id: entry.stem,
+      image_path: entry.path,
+      correct_word: correctWord,
+      letters: shuffledLetters,
+    }
+  })
 }

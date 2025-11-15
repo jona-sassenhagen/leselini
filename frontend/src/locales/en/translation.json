@@ -21,5 +21,7 @@
   "languageGerman": "German",
   "forkMessage": "Fork to choose your own items",
   "victoryTitle": "Your result",
-  "victorySummary": "You answered {{correct}} of {{total}} correctly."
+  "victorySummary": "You answered {{correct}} of {{total}} correctly.",
+  "writingGameEasy": "Arrange the letters in the correct order (Easy)",
+  "writingGameHard": "Arrange the letters in the correct order (Hard)"
 }

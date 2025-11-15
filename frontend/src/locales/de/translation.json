@@ -21,5 +21,7 @@
   "languageGerman": "Deutsch",
   "forkMessage": "Forken, um eigene Inhalte auszuwählen",
   "victoryTitle": "Dein Ergebnis",
-  "victorySummary": "Du hast {{correct}} von {{total}} richtig beantwortet."
+  "victorySummary": "Du hast {{correct}} von {{total}} richtig beantwortet.",
+  "writingGameEasy": "Ordne die Buchstaben in der richtigen Reihenfolge (Einfach)",
+  "writingGameHard": "Ordne die Buchstaben in der richtigen Reihenfolge (Schwer)"
 }
