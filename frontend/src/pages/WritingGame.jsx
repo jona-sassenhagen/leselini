@@ -142,28 +142,35 @@ export default function WritingGame() {
     }
   }
 
-  const handleMouseDown = (e, i) => {
+  const handlePointerDown = (e, i) => {
     if (hasResponded) return
 
     const container = e.currentTarget.parentElement
     const rect = container.getBoundingClientRect()
 
-    // Calculate offset from mouse to current tile position
+    // Get client coordinates (works for both mouse and touch)
+    const clientX = e.clientX
+    const clientY = e.clientY
+
+    // Calculate offset from pointer to current tile position
     const currentPos = letterPositions[i]
     const currentPixelX = (currentPos.x / 100) * rect.width + rect.left
     const currentPixelY = currentPos.y + rect.top + rect.height / 2
 
-    const offsetX = e.clientX - currentPixelX
-    const offsetY = e.clientY - currentPixelY
+    const offsetX = clientX - currentPixelX
+    const offsetY = clientY - currentPixelY
 
     setDraggedIndex(i)
     setDragOffset({ x: offsetX, y: offsetY })
     setIsDragging(true)
 
+    // Set pointer capture for smooth dragging
+    e.currentTarget.setPointerCapture(e.pointerId)
+
     e.preventDefault()
   }
 
-  const handleMouseMove = (e) => {
+  const handlePointerMove = (e) => {
     if (!isDragging || draggedIndex === null || hasResponded) return
 
     const container = document.querySelector('.letter-container')
@@ -171,9 +178,13 @@ export default function WritingGame() {
 
     const rect = container.getBoundingClientRect()
 
+    // Get client coordinates (works for both mouse and touch)
+    const clientX = e.clientX
+    const clientY = e.clientY
+
     // Calculate new position relative to container, accounting for offset
-    const newX = ((e.clientX - dragOffset.x - rect.left) / rect.width) * 100
-    const newY = e.clientY - dragOffset.y - rect.top - rect.height / 2
+    const newX = ((clientX - dragOffset.x - rect.left) / rect.width) * 100
+    const newY = clientY - dragOffset.y - rect.top - rect.height / 2
 
     // Update position
     const newPositions = letterPositions.map((pos, idx) =>
@@ -183,27 +194,20 @@ export default function WritingGame() {
     setLetterPositions(newPositions)
   }
 
-  const handleMouseUp = () => {
+  const handlePointerUp = (e) => {
     if (!isDragging || draggedIndex === null || hasResponded) return
 
     setIsDragging(false)
     setDraggedIndex(null)
 
+    // Release pointer capture
+    if (e.currentTarget && e.currentTarget.releasePointerCapture) {
+      e.currentTarget.releasePointerCapture(e.pointerId)
+    }
+
     // Check answer after drag
     checkAnswer(letterPositions)
   }
-
-  useEffect(() => {
-    if (isDragging) {
-      window.addEventListener('mousemove', handleMouseMove)
-      window.addEventListener('mouseup', handleMouseUp)
-
-      return () => {
-        window.removeEventListener('mousemove', handleMouseMove)
-        window.removeEventListener('mouseup', handleMouseUp)
-      }
-    }
-  }, [isDragging, draggedIndex, letterPositions, hasResponded])
 
   if (error) return <div>{t('errorPreparingGame')}</div>
   if (!batch) return <div>{t('loading')}</div>
@@ -240,7 +244,10 @@ export default function WritingGame() {
           <div
             key={pos.id}
             className={`letter-tile ${draggedIndex === i ? 'dragging' : ''} ${hasResponded ? 'disabled' : ''} ${isAnimating ? 'animating' : ''}`}
-            onMouseDown={(e) => handleMouseDown(e, i)}
+            onPointerDown={(e) => handlePointerDown(e, i)}
+            onPointerMove={(e) => handlePointerMove(e)}
+            onPointerUp={(e) => handlePointerUp(e)}
+            onPointerCancel={(e) => handlePointerUp(e)}
             style={{
               left: `${pos.x}%`,
               top: `${pos.y}px`,

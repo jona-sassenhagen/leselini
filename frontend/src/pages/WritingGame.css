@@ -37,7 +37,11 @@
   border-radius: 8px;
   cursor: grab;
   user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
   touch-action: none;
+  -webkit-touch-callout: none;
   transition: box-shadow 0.2s;
   transform: translate(-50%, -50%);
   margin-left: -30px;
