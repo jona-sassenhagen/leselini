@@ -6,7 +6,9 @@ import ImageMatch from './pages/ImageMatch'
 import FirstLetterMatch from './pages/FirstLetterMatch'
 import InverseFirstLetterMatch from './pages/InverseFirstLetterMatch'
 import WordMatchHard from './pages/WordMatchHard'
-import WritingGame from './pages/WritingGame' 
+import WritingGame from './pages/WritingGame'
+import PartialWritingGame from './pages/PartialWritingGame'
+import MostlyScrambledWritingGame from './pages/MostlyScrambledWritingGame' 
 
 export default function App() {
   return (
@@ -19,6 +21,8 @@ export default function App() {
         <Route path="/first-letter-match/:id" element={<FirstLetterMatch />} />
         <Route path="/inverse-first-letter-match/:id" element={<InverseFirstLetterMatch />} />
         <Route path="/writing-game/:id" element={<WritingGame />} />
+        <Route path="/partial-writing-game/:id" element={<PartialWritingGame />} />
+        <Route path="/mostly-scrambled-writing-game/:id" element={<MostlyScrambledWritingGame />} />
       </Routes>
     </HashRouter>
   )

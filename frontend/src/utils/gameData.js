@@ -91,6 +91,10 @@ const WORDSETS = [
   { id: 'dynamic-hard', title: 'Which word matches the picture? (Hard)' },
   { id: 'writing-game-easy', title: 'Arrange the letters to spell the word (Easy)' },
   { id: 'writing-game-hard', title: 'Arrange the letters to spell the word (Hard)' },
+  { id: 'writing-game-partial-easy', title: 'Put 2 letters in the right place (Easy)' },
+  { id: 'writing-game-partial-hard', title: 'Put 2 letters in the right place (Hard)' },
+  { id: 'writing-game-mostly-easy', title: 'Arrange letters with 2 fixed (Easy)' },
+  { id: 'writing-game-mostly-hard', title: 'Arrange letters with 2 fixed (Hard)' },
 ]
 
 export function getWordsets() {
@@ -249,6 +253,14 @@ export function generateWritingGameBatch(wordsetId, language = DEFAULT_LANGUAGE,
     ? pool.filter((entry) => entry.word.length <= 4)
     : wordsetId === 'writing-game-hard'
     ? pool.filter((entry) => entry.word.length > 4)
+    : wordsetId === 'writing-game-partial-easy'
+    ? pool.filter((entry) => entry.word.length >= 3 && entry.word.length <= 5)
+    : wordsetId === 'writing-game-partial-hard'
+    ? pool.filter((entry) => entry.word.length > 5)
+    : wordsetId === 'writing-game-mostly-easy'
+    ? pool.filter((entry) => entry.word.length >= 4 && entry.word.length <= 6)
+    : wordsetId === 'writing-game-mostly-hard'
+    ? pool.filter((entry) => entry.word.length > 6)
     : pool
 
   const available = Math.min(size, filteredPool.length)

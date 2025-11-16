@@ -23,5 +23,9 @@
   "victoryTitle": "Dein Ergebnis",
   "victorySummary": "Du hast {{correct}} von {{total}} richtig beantwortet.",
   "writingGameEasy": "Ordne die Buchstaben in der richtigen Reihenfolge (Einfach)",
-  "writingGameHard": "Ordne die Buchstaben in der richtigen Reihenfolge (Schwer)"
+  "writingGameHard": "Ordne die Buchstaben in der richtigen Reihenfolge (Schwer)",
+  "writingGamePartialEasy": "Setze 2 Buchstaben an die richtige Stelle (Einfach)",
+  "writingGamePartialHard": "Setze 2 Buchstaben an die richtige Stelle (Schwer)",
+  "writingGameMostlyEasy": "Ordne Buchstaben mit 2 festen (Einfach)",
+  "writingGameMostlyHard": "Ordne Buchstaben mit 2 festen (Schwer)"
 }

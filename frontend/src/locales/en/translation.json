@@ -23,5 +23,9 @@
   "victoryTitle": "Your result",
   "victorySummary": "You answered {{correct}} of {{total}} correctly.",
   "writingGameEasy": "Arrange the letters in the correct order (Easy)",
-  "writingGameHard": "Arrange the letters in the correct order (Hard)"
+  "writingGameHard": "Arrange the letters in the correct order (Hard)",
+  "writingGamePartialEasy": "Put 2 letters in the right place (Easy)",
+  "writingGamePartialHard": "Put 2 letters in the right place (Hard)",
+  "writingGameMostlyEasy": "Arrange letters with 2 fixed (Easy)",
+  "writingGameMostlyHard": "Arrange letters with 2 fixed (Hard)"
 }

@@ -10,7 +10,7 @@ import correctIcon from '../assets/feedback/correct.png'
 import wrongIcon from '../assets/feedback/wrong.png'
 import neutralIcon from '../assets/feedback/neutral.png'
 
-export default function WritingGame() {
+export default function PartialWritingGame() {
   const { t, i18n } = useTranslation()
   const { id } = useParams()
   const navigate = useNavigate()
@@ -51,17 +51,76 @@ export default function WritingGame() {
 
   useEffect(() => {
     if (batch && batch.length > 0) {
-      // Initialize letters with random positions
-      const letters = batch[index].letters
-      const positions = letters.map((letter, i) => ({
-        letter,
-        id: `${index}-${i}`,
-        // Random horizontal position distributed across the container
-        x: (i / letters.length) * 100 + (Math.random() - 0.5) * 10,
-        // Random vertical offset for variability
-        y: Math.random() * 40 - 20, // -20px to +20px
-      }))
-      setLetterPositions(positions)
+      // Get the correct word and split into letters
+      const correctWord = batch[index].correct_word
+      const correctLetters = correctWord.split('')
+      const totalLetters = correctLetters.length
+
+      // Choose 2 random indices to scramble
+      const scrambledIndices = new Set()
+      while (scrambledIndices.size < Math.min(2, totalLetters)) {
+        scrambledIndices.add(Math.floor(Math.random() * totalLetters))
+      }
+
+      // Wait for slots to render, then calculate their positions
+      setTimeout(() => {
+        const slotContainer = document.querySelector('.letter-slots')
+        const letterContainer = document.querySelector('.letter-container')
+
+        if (!slotContainer || !letterContainer) {
+          // Fallback if DOM not ready
+          const positions = correctLetters.map((letter, i) => ({
+            letter,
+            id: `${index}-${i}`,
+            x: Math.random() * 100,
+            y: Math.random() * 60 - 50,
+          }))
+          setLetterPositions(positions)
+          return
+        }
+
+        const slotRect = slotContainer.getBoundingClientRect()
+        const containerRect = letterContainer.getBoundingClientRect()
+        const slots = slotContainer.querySelectorAll('.letter-slot')
+
+        const positions = correctLetters.map((letter, i) => {
+          const isScrambled = scrambledIndices.has(i)
+
+          if (isScrambled) {
+            // Random position in upper area
+            return {
+              letter,
+              id: `${index}-${i}`,
+              x: Math.random() * 100,
+              y: Math.random() * 60 - 50,
+            }
+          } else {
+            // Position in the corresponding slot
+            const slot = slots[i]
+            if (!slot) {
+              return {
+                letter,
+                id: `${index}-${i}`,
+                x: (i / totalLetters) * 100 + 50 / totalLetters,
+                y: 100,
+              }
+            }
+
+            const slotBounds = slot.getBoundingClientRect()
+            const targetX = ((slotBounds.left + slotBounds.width / 2 - containerRect.left) / containerRect.width) * 100
+            const targetY = slotBounds.top + slotBounds.height / 2 - containerRect.top
+
+            return {
+              letter,
+              id: `${index}-${i}`,
+              x: targetX,
+              y: targetY,
+            }
+          }
+        })
+
+        setLetterPositions(positions)
+      }, 0)
     }
   }, [batch, index])
 
@@ -110,7 +169,6 @@ export default function WritingGame() {
       const slotBounds = slot.getBoundingClientRect()
 
       // Calculate position relative to letter container for perfect overlap
-      // The slot center should align with where the letter tile will be
       const targetX = ((slotBounds.left + slotBounds.width / 2 - containerRect.left) / containerRect.width) * 100
       const targetY = slotBounds.top + slotBounds.height / 2 - containerRect.top
 
