@@ -16,7 +16,7 @@
     "react-router-dom": "^6.4.0",
     "i18next": "^23.0.1",
     "react-i18next": "^13.0.1",
-    "i18next-browser-languagedetector": "^7.0.1"
+    "i18next-browser-languagedetector": "^8.2.1"
   },
   "devDependencies": {
     "vite": "^4.0.0",
